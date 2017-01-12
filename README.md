@@ -28,6 +28,7 @@ Security is handled via simple auth over an HTTPS connection.
       logger.py : Logging setup
       modem.py  : Modem communication functions
       parse.py  : Handles incoming and outgoing requests
+      queue.py  : Non-volatile disk-based message queue
 ```
 
 ## Software
