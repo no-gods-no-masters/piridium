@@ -1,41 +1,49 @@
 #!/usr/bin/env python
 
+# Pything imports
 import os
 import uuid
 import time
+
+# Application imports
 from logger import log
 
+# The Queue class uses a simple file handler to read and write messages from
+# a disk-based queue for sending.
 
 class Queue(object):
     def __init__(self, qdir):
-        self.QDIR = qdir
-        print "qdir", self.QDIR
+        self.qdir = qdir
 
-        if not os.path.isdir(self.QDIR):
-            os.mkdir(self.QDIR)
+        print "self.qdir: ", self.qdir
+
+        if not os.path.isdir(self.qdir):
+            os.mkdir(self.qdir)
 
     # Add message into the queue by creating a file with a UUID
     def add(self, message):
         if len(message) > 270:
-            log.info("Failure... sbd message must be less than 270 bytes\n")
-            # need error handling 
+            log.info("Failed... SBD message must be less than 270 bytes.\n")
+
+        # TO DO: Add error handling
+
         uid = uuid.uuid4()
-        file_path = os.path.join(self.QDIR, str(uid))
+        file_path = os.path.join(self.qdir, str(uid))
         with open(file_path, 'w') as f:
             f.write(message + "\n")
 
-    # return the number of files currently in queue
+    # Return the number of files currently in queue.
     def count(self):
-        num = len(os.listdir(self.QDIR))
+        num = len(os.listdir(self.qdir))
         return num
 
-    # get oldest file in queue
+    # Get oldest file in queue.
     def get(self):
         dict = {}
-    
-        #make a dict of with mtime keys value set to path
-        for f in os.listdir(self.QDIR):
-            p = os.path.join(self.QDIR, f)
+
+        # Create a dict with mtime key value set to path.
+        for f in os.listdir(self.qdir):
+            p = os.path.join(self.qdir, f)
             dict[os.stat(p).st_mtime] = p
 
         time_list = dict.keys()
@@ -43,5 +51,3 @@ class Queue(object):
 
         oldest_file = dict[time_list[0]]
         return oldest_file
-
-                
