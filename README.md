@@ -97,5 +97,5 @@ Creating your own application that utilizes Piridium is straightforward.
   - Import the modules in your Python script per your directory structure, and refer to our `./example` application documentation.
 
 ## Credits
-- Conceptualized and funded by [Hala Systems, Inc.](http://halasystems.com) for their Sentry initiative.
+- Conceptualized and funded by [Hala Systems, Inc.](http://halasystems.com).
 - Developed, implemented, and documented by [NGNM](http://ngnm.us/).
