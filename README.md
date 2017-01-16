@@ -1,4 +1,5 @@
-# Piridium
+![Piridium](assets/logo-pridium-1000x225.png)
+
 A Python-based Iridium communication library.
 
 ## Overview
