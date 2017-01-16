@@ -85,7 +85,7 @@ Port to communicate with.
 - Consult [Rock7's Development Guide](http://www.rock7.com/downloads/RockBLOCK-Developer-Guide-Mk2.pdf) for more details.
 
 ## Usage
-See: `./example/README.md` ([Link](https://github.com/no-gods-no-masters/hala-rockblock/tree/master/example))
+See: `./example/README.md` ([Link](example/))
 
 ## Integrating Piridium
 Creating your own application that utilizes Piridium is straightforward.
