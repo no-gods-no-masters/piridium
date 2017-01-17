@@ -75,18 +75,22 @@ class Parse(object):
                 for key in status.keys():
                     log.debug("%s - %s" % (key, status[key]))
 
-                if mode == "listen":
-                    log.debug("listen mode")
+                if mode[0] == "listen":
+                    log.debug("*****listen mode")
                     if status["mtstatus"] == 1:
                         return "AT+SBDRT"
-                    if status["mtstatus"] != 1:
-                        # need error handling
-                        return True
-                elif mode == "send":
-                    log.debug("send mode")
+                    elif status["mtstatus"] == 2:
+                        log.debug("message failure, trying again in 45 seconds...")
+                        self.try_again()
+                        return "AT+SBDIX"
+                    else:
+                        log.warn("no message avaialble.  could be a problem!")
+                        return "AT+SBDS"
+                elif mode[0] == "send":
+                    log.debug("*****send mode")
                     if status["mostatus"] < 4:
                         log.debug("MO message sent")
-                        return "AT+SBDD0"
+                        return "CLEAR"
                     else:
                         log.info("Message failed to send trying again in 45 seconds...")
                         t = threading.Thread(target=self.try_again)
@@ -97,7 +101,7 @@ class Parse(object):
                         
             else:
                 log.warn("Failed to split incoming message.")
-                return False
+                #return False
 
     # Request handler: SBDRT
     @staticmethod
@@ -126,7 +130,7 @@ class Parse(object):
 
 
         if status["mostatus"] > 0:
-            return "AT+SBDWT" 
+            return "AT+SBDIX" 
         return "AT+SBDS"
     # Request handler: SBDWT
     @staticmethod

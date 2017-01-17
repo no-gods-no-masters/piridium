@@ -56,11 +56,6 @@ if len(args) < 1:
 else:
     Q.add(args[0])
 
-# if there are no changes to the directory being monitored 'wait'
-def wait_for_dir_changes(dir, old):
-    while os.stat(dir).st_mtime == old:
-        time.sleep(.1)
-        pass
 
 # Monitor the queue dir if there are files send them oldest to newest.
 def check_queue_dir(dir):
@@ -76,9 +71,9 @@ def check_queue_dir(dir):
 
             App.send_sbd_message(data, oldest_file)
 
-            wait_for_dir_changes(dir, old)
+            Q.update(dir, old)
         else:
-            wait_for_dir_changes(dir, old)
+            Q.update(dir, old)
 
 # Run the queue sending function.
 # Allow ^C to exit gracefully.
@@ -86,7 +81,7 @@ try:
     initiate_stop = threading.Event()
 
     t = threading.Thread(
-        target=App.monitor, args=(initiate_stop,"send", _callback)
+        target=App.monitor, args=(initiate_stop, ["send"], _callback)
     )
 
     t.daemon = True

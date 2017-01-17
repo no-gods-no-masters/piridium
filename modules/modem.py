@@ -4,8 +4,10 @@
 
 # Python imports
 import os
+import sys
 import time
 import serial
+import threading
 import ConfigParser as cfgp
 
 # Set up config
@@ -19,7 +21,7 @@ from logger import log
 # The Modem class represents the Iridium 9602 modem within the RockBLOCK,
 # and contains all functions related to the modem. It should be instantiated
 # once for each RockBLOCK.
-
+Parser = Parse()
 class Modem(object):
 
     # Initialize with simple defaults
@@ -54,6 +56,7 @@ class Modem(object):
     def send_command(self, message):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
+        log.debug("sent command %s" % command)
 
     #temporary I will move this someplace good
     def string_to_hex(self, string):
@@ -63,22 +66,22 @@ class Modem(object):
         return output
 
     # Send an SBD message
-    def send_sbd_message(self, message, filename):
-        print "DEBUG %s" % filename
+    def send_sbd_message(self, message, filename=''):
         self.filename = filename
-        print "DEBUG SELF", self.filename
         if len(message) > 270:
             return False
         else:
             log.info("sending message.\nchars: %s\nmessage: %s" % (len(message), message))
             self.send_command("AT+SBDWT=%s" % message)
-            time.sleep(1)
-            self.send_command("AT+SBDS")
+            #time.sleep(1)
+            #self.send_command("AT+SBDS")
+            return
+            
 
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
     def process_buffer(self, mode, callback):
-        Parser = Parse()
+        
         log.debug("Processing modem input buffer...")
         if "SBDRING" in self.data:
             # need a timer for second SBDRING
@@ -90,19 +93,24 @@ class Modem(object):
             if response == "AT+SBDRT":
                 log.info("Response parsed. Sending command.")
                 self.send_command(response)
-            elif response == "AT+SBDWT":
+            elif "AT+SBDWT" in response:
                 log.info("Message ready to send...\n")
+                self.send_command("AT+SBDS")
+            elif response == "AT+SBDIX":
                 self.send_command("AT+SBDIX")
-            elif response == "AT+SBDD0":
+            elif response == "CLEAR":
                 log.info("Clearing output buffer")
-                self.send_command(response)
-                log.info("Deleting file: %s" % self.filename)
-                os.remove(self.filename)
-            elif response == "AT+CSQF" or response == "AT+SBDMTA=1" or response == "AT+SBDAREG=1" or response == True:
-                pass
+                self.send_command("AT+SBDD0")
+                if self.filename:
+                    log.info("Deleting file: %s" % self.filename)
+                    os.remove(self.filename)
+            elif "AT+CSQF" in response or "AT+SBDMTA=1" in response or "AT+SBDAREG=1" in response  or "AT+SBDD" in response or "AT+SBDS" in response or "AT\nOK" in response:
+                log.info(response)
             elif response:
                 if callable(callback):
-                    callback(response)
+                    c = threading.Thread(target=callback, args=(response,))
+                    c.start()
+                    #callback(response)
                 return response
             elif response == False:
                 log.debug("Not an SBD exchange message.")
@@ -113,12 +121,11 @@ class Modem(object):
     # The monitor function sets up a listener on the serial port to await
     # commands.
     def monitor(self, stop_event,  mode, callback):
-        print 'stop', stop_event.is_set()
         log.debug("Monitoring serial port '" + self.port + "'")
         log.debug("Monitor mode: %s" % mode)
         lines = ""
         targetWordList = ["OK", "SBDRING"]
-        while not stop_event.wait(0):
+        while True:  #not stop_event.wait(0):
             line =  self.serialPort.readline()
             lines += line
             for word in targetWordList:

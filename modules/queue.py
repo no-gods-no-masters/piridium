@@ -4,6 +4,7 @@
 import os
 import uuid
 import time
+import threading
 
 # Application imports
 from logger import log
@@ -15,7 +16,7 @@ class Queue(object):
     def __init__(self, qdir):
         self.qdir = qdir
 
-        print "self.qdir: ", self.qdir
+        log.debug("self.qdir: %s" % self.qdir)
 
         if not os.path.isdir(self.qdir):
             os.mkdir(self.qdir)
@@ -51,3 +52,10 @@ class Queue(object):
 
         oldest_file = dict[time_list[0]]
         return oldest_file
+
+    # if there are no changes to the directory (monitor_dir) being monitored 'wait'
+    def update(self,monitor_dir, old_time):
+        while os.stat(monitor_dir).st_mtime == old_time:
+            time.sleep(1)
+            pass
+        return
