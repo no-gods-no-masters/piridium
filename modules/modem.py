@@ -42,6 +42,7 @@ class Modem(object):
         
         #send two commands simultaniously
         self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
+        self.ready = False
         
     # String return of port status (for debugging)
     def status(self):
@@ -55,8 +56,7 @@ class Modem(object):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
         log.debug("sent command %s" % command)
-
-
+    
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
         self.filename = filename
@@ -85,6 +85,7 @@ class Modem(object):
                 
         elif self.response in {"AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1", "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS", "AT\nOK"}:
             log.info(self.response)
+            self.ready = True
             
         elif self.response:
             if callable(callback):

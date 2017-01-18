@@ -53,6 +53,7 @@ if len(args) < 1:
         "Please add a message to send.\nUsage: ./reply.py <message>\n"
     )
     sys.exit(1)
+
 else:
     Q.add(args[0])
 
@@ -74,6 +75,7 @@ def check_queue_dir(dir):
             print 'waiting...'
             Q.update(dir, old)
         else:
+            old = os.stat(dir).st_mtime
             Q.update(dir, old)
 
 # Run the queue sending function.
@@ -87,9 +89,8 @@ try:
 
     t.daemon = True
     t.start()
-    
-    # let the monitor finish starting up before issuing new commands
-    time.sleep(1)
+    while not App.ready:
+        pass
     check_queue_dir(QDIR)
     signal.pause()
 except KeyboardInterrupt:
