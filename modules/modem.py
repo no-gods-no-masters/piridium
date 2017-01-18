@@ -39,11 +39,9 @@ class Modem(object):
 
         self.data  = ""
         self.delay = delay
-
-        self.send_command("AT+SBDMTA=1")
-        time.sleep(.25)
-        self.send_command("AT+SBDAREG=1")
-        time.sleep(.25)
+        
+        #send two commands simultaniously
+        self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
         
     # String return of port status (for debugging)
     def status(self):
@@ -58,12 +56,6 @@ class Modem(object):
         self.serialPort.write(bytes(command))
         log.debug("sent command %s" % command)
 
-    #temporary I will move this someplace good
-    def string_to_hex(self, string):
-        output = ''
-        for char in str(string):
-            output += format(ord(char), 'x')
-        return output
 
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
@@ -80,44 +72,32 @@ class Modem(object):
 
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
-    def process_buffer(self, mode, callback):
-        
-        log.debug("Processing modem input buffer...")
-        if "SBDRING" in self.data:
-            # need a timer for second SBDRING
-            log.info("SBDRING detected. Sending AT+SBDIX.")
-            self.send_command("AT+SBDIX")
-        else:
-            log.debug("Parsing request...")
-            response = Parser.request(self.data, self.delay, mode)
-            if response == "AT+SBDRT":
-                log.info("Response parsed. Sending command.")
-                self.send_command(response)
-            elif "AT+SBDWT" in response:
-                log.info("Message ready to send...\n")
-                self.send_command("AT+SBDS")
-            elif response == "AT+SBDIX":
-                self.send_command("AT+SBDIX")
-            elif response == "CLEAR":
-                log.info("Clearing output buffer")
-                self.send_command("AT+SBDD0")
-                if self.filename:
-                    log.info("Deleting file: %s" % self.filename)
-                    os.remove(self.filename)
-            elif "AT+CSQF" in response or "AT+SBDMTA=1" in response or "AT+SBDAREG=1" in response  or "AT+SBDD" in response or "AT+SBDS" in response or "AT\nOK" in response:
-                log.info(response)
-            elif response:
-                if callable(callback):
-                    c = threading.Thread(target=callback, args=(response,))
+    def process_response(self, mode, callback):
+        if self.response in {"AT+SBDIX", "AT+SBDRT", "AT+SBDS"}:
+            self.send_command(self.response)
+            
+        elif self.response == "CLEAR":
+            log.info("Clearing output buffer")
+            self.send_command("AT+SBDD0")
+            if self.filename:
+                log.info("Deleting file: %s" % self.filename)
+                os.remove(self.filename)
+                
+        elif self.response in {"AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1", "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS", "AT\nOK"}:
+            log.info(self.response)
+            
+        elif self.response:
+            if callable(callback):
+                    c = threading.Thread(target=callback, args=(self.response,))
                     c.start()
-                    #callback(response)
-                return response
-            elif response == False:
-                log.debug("Not an SBD exchange message.")
-            else:
-                print("ELSE")
-                print(response)
-
+                    
+        elif self.response == False:
+            log.info(self.response)
+            
+        else:
+            print "ELSE"
+            log.info(self.response)
+       
     # The monitor function sets up a listener on the serial port to await
     # commands.
     def monitor(self, stop_event,  mode, callback):
@@ -132,4 +112,6 @@ class Modem(object):
                 if word in line:
                     self.data = lines
                     lines = ""
-                    self.process_buffer(mode, callback)
+                    self.response = Parser.request(self.data, self.delay, mode)
+                    self.process_response(self.response, callback)
+                    
