@@ -11,6 +11,7 @@ import threading
 
 # Application imports
 from logger import log
+import modem
 
 class Parse(object):
 
@@ -18,7 +19,11 @@ class Parse(object):
 
     # Parse an incoming request
     def request(self, data, delay, mode):
-        if "SBDIX:" in data:
+        #print "PARSING\n---v\n%s\n^---" % data
+        if "SBDRING" in data:
+            log.info("SBDRING detected. Sending AT+SBDIX.")
+            return "AT+SBDIX"
+        elif "SBDIX:" in data:
             out = self._sbdix(data, mode)
             return out
         elif "CSQF:" in data:
@@ -30,12 +35,13 @@ class Parse(object):
         elif "SBDD" in data:
             out = self._sbdd(data)
             return out
-        elif "SBDWT:" in data:
-            out = self._sbdwt(data)
-            return out
+        elif "SBDWT" in data:
+            return "AT+SBDS"
         elif "SBDS:" in data:
             out = self._sbds(data)
             return out
+        elif "AT+SBDAREG=1;+SBDMTA=1" in data:
+            return "AT+SBDAREG=1;+SBDMTA=1"
         else:
             return data
 
@@ -93,9 +99,8 @@ class Parse(object):
                         return "CLEAR"
                     else:
                         log.info("Message failed to send trying again in 45 seconds...")
-                        t = threading.Thread(target=self.try_again)
-                        t.start
-                        return "AT+SBDWT"
+                        self.try_again()
+                        return "AT+SBDIX"
                 else:
                     log.debug("wtf mode")
                         
@@ -112,6 +117,7 @@ class Parse(object):
         log.debug("Raw message: %s" % data)
         log.debug("Parsed message: %s" % message_parsed)
         return message_parsed
+        
 
     # Request handler: SBDS
     @staticmethod
@@ -133,6 +139,4 @@ class Parse(object):
             return "AT+SBDIX" 
         return "AT+SBDS"
     # Request handler: SBDWT
-    @staticmethod
-    def _sbdwt(data):
-        return ("AT+SBDWT")
+
