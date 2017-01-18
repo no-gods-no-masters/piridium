@@ -74,6 +74,7 @@ else:
 
 # Print debug information.
 if options.verbose:
+    sys.stdout.write("Output    : %s\n" % args[0])
     sys.stdout.write('Hex output: %s\n' % send_string)
     sys.stdout.write('RockBLOCK name: %s\n' % options.which_rb)
 

@@ -59,9 +59,9 @@ else:
 
 # Monitor the queue dir if there are files send them oldest to newest.
 def check_queue_dir(dir):
-    while True:
-        old = os.stat(dir).st_mtime
-        if Q.count() > 0:
+    while True:        
+        while Q.count() > 0:
+            old = os.stat(dir).st_mtime
             log.info("Getting oldest file from queue...")
             oldest_file = Q.get()
             log.info("Oldest file: %s" % oldest_file)
@@ -69,8 +69,9 @@ def check_queue_dir(dir):
             with open(oldest_file) as f:
                 data = f.read()
 
-            App.send_sbd_message(data, oldest_file)
-
+            t = threading.Thread(target=App.send_sbd_message, args=(data, oldest_file))
+            t.start()
+            print 'waiting...'
             Q.update(dir, old)
         else:
             Q.update(dir, old)
@@ -86,7 +87,9 @@ try:
 
     t.daemon = True
     t.start()
-
+    
+    # let the monitor finish starting up before issuing new commands
+    time.sleep(1)
     check_queue_dir(QDIR)
     signal.pause()
 except KeyboardInterrupt:
