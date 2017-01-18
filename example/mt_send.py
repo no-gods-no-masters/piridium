@@ -13,7 +13,6 @@ import sys
 import urllib
 import urllib2
 import getpass
-import ConfigParser as cfgp
 from optparse import OptionParser
 
 # Application imports
