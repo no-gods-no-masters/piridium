@@ -16,9 +16,9 @@ import getpass
 import ConfigParser as cfgp
 from optparse import OptionParser
 
-# Data Setup
-config = cfgp.ConfigParser()
-config.read("./config.ini")
+# Application imports
+sys.path.append("../modules")
+from config import Config
 
 # Option setup
 opt_parser = OptionParser()
@@ -56,7 +56,7 @@ if options.test_mode:
 
 # See send-example.ini for examples.
 try:
-    imei = config.get("imei", options.which_rb)
+    imei = Config.get("imei")[options.which_rb]
 except:
     sys.stderr.write(
         "Use the -x flag to specify -x sma or -x patch to select RockBLOCK.\n\
@@ -79,9 +79,9 @@ if options.verbose:
 
 # Collect the username and password from the user if not in config.
 # Empty string is used for testing.
-username = config.get("post", "username")
+username = Config.get("post")["username"]
 if not options.test_mode:
-    pw = config.get("post", "password")
+    pw = config.get("post")["password"]
     if not pw:
         pw = getpass.getpass("Rock7 password: ")
 else:

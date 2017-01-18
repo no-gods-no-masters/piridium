@@ -6,14 +6,10 @@
 import os
 import time
 import serial
-import ConfigParser as cfgp
-
-# Set up config
-config = cfgp.ConfigParser()
-config.read("./config.ini")
 
 # Application imports
-from parse import Parse
+from config import Config
+from parse  import Parse
 from logger import log
 
 # The Modem class represents the Iridium 9602 modem within the RockBLOCK,
@@ -25,10 +21,10 @@ class Modem(object):
     # Initialize with simple defaults
     def __init__(self, baud=None, port=None, delay=None):
         if baud is None:
-            baud = config.get("modem", "baud")
+            baud = Config.get("modem")["baud"]
 
         if port is None:
-            port = config.get("modem", "port")
+            port = Config.get("modem")["port"]
 
         self.baud = baud
         self.port = port
@@ -42,7 +38,7 @@ class Modem(object):
         time.sleep(.25)
         self.send_command("AT+SBDAREG=1")
         time.sleep(.25)
-        
+
     # String return of port status (for debugging)
     def status(self):
         baud   = "baud: %r \n" % self.baud
