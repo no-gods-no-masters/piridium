@@ -71,6 +71,10 @@ Baud rate to communicate with the port.
 `port` (str) [`/dev/ttyUSB0`]
 Port to communicate with.
 
+##### Retreiving Config Data
+A wrapper has been built for ConfigParser to simplify and normalize the retreival of config data. 
+The correct syntax is `Config.get("section")["key"]`, where \<section> is required and [key] is optional. If you do not specify a [key] the function will return a dictionary object for the specified \<section>.
+
 ## Hardware
 
 ### Dependencies
