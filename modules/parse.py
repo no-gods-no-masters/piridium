@@ -140,5 +140,5 @@ class Parse(object):
 
         if status["mostatus"] > 0:
             return "AT+SBDIX"
-        return "AT+SBDS"
+        return
     # Request handler: SBDWT
