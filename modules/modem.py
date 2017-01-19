@@ -64,8 +64,6 @@ class Modem(object):
                 (len(message), message)
             )
             self.send_command("AT+SBDWT=%s" % message)
-            #time.sleep(1)
-            #self.send_command("AT+SBDS")
             return
 
 
@@ -107,7 +105,7 @@ class Modem(object):
         log.debug("Monitor mode: %s" % mode)
         lines = ""
         targetWordList = ["OK", "SBDRING"]
-        while True:  #not stop_event.wait(0):
+        while True:
             line =  self.serialPort.readline()
             lines += line
             for word in targetWordList:
