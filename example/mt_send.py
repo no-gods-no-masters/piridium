@@ -89,12 +89,12 @@ else:
     pw = ''
 
 # TO DO: Move these to an external configuration file.
-url  = 'https://core.rock7.com/rockblock/MT'
+url  = Config.get("post")["url"]
 data = urllib.urlencode({
-    'imei'     : imei,
-    'username' : username,
-    'password' : pw,
-    'data'     : send_string
+    "imei"     : imei,
+    "username" : username,
+    "password" : pw,
+    "data"     : send_string
 })
 
 # Prints the contents of the POST data to the command line when the verbose
