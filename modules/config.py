@@ -3,22 +3,24 @@
 # Simple config wrapper to normalize and simplify app config.
 
 # Python imports
-import ConfigParser
+import logging
+import ConfigParser as cfgp
+
+# Set up config
+config = cfgp.ConfigParser()
+config.read("./config.ini")
 
 class Config(object):
-    def __init__(self):
-        # Set up config
-        self.cfpg = ConfigParser.ConfigParser()
-        self.cfpg.read("./config.ini")
 
-    def get(self, section):
+    @staticmethod
+    def get(section):
         dict1 = {}
-        options = self.cfpg.options(section)
+        options = config.options(section)
         for option in options:
             try:
-                dict1[option] = self.cfpg.get(section, option)
+                dict1[option] = config.get(section, option)
                 if dict1[option] == -1:
-                    DebugPrint("Skip: %s" % option)
+                    log.debug("Skip: %s" % option)
             except:
                 print("Exception on %s!" % option)
                 dict1[option] = None
