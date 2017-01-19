@@ -1,4 +1,5 @@
-# Piridium
+![Piridium](assets/logo-pridium-1000x225.png)
+
 A Python-based Iridium communication library.
 
 ## Overview
@@ -28,6 +29,7 @@ Security is handled via simple auth over an HTTPS connection.
       logger.py : Logging setup
       modem.py  : Modem communication functions
       parse.py  : Handles incoming and outgoing requests
+      queue.py  : Non-volatile disk-based message queue
 ```
 
 ## Software
@@ -69,6 +71,10 @@ Baud rate to communicate with the port.
 `port` (str) [`/dev/ttyUSB0`]
 Port to communicate with.
 
+##### Retreiving Config Data
+A wrapper has been built for ConfigParser to simplify and normalize the retreival of config data. 
+The correct syntax is `Config.get("section")["key"]`, where \<section> is required and [key] is optional. If you do not specify a [key] the function will return a dictionary object for the specified \<section>.
+
 ## Hardware
 
 ### Dependencies
@@ -83,7 +89,7 @@ Port to communicate with.
 - Consult [Rock7's Development Guide](http://www.rock7.com/downloads/RockBLOCK-Developer-Guide-Mk2.pdf) for more details.
 
 ## Usage
-See: `./example/README.md` ([Link](https://github.com/no-gods-no-masters/hala-rockblock/tree/master/example))
+See: `./example/README.md` ([Link](example/))
 
 ## Integrating Piridium
 Creating your own application that utilizes Piridium is straightforward.
@@ -96,5 +102,5 @@ Creating your own application that utilizes Piridium is straightforward.
   - Import the modules in your Python script per your directory structure, and refer to our `./example` application documentation.
 
 ## Credits
-- Conceptualized and funded by [Hala Systems, Inc.](http://halasystems.com) for their Sentry initiative.
+- Conceptualized and funded by [Hala Systems](http://halasystems.com).
 - Developed, implemented, and documented by [NGNM](http://ngnm.us/).

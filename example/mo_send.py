@@ -33,8 +33,9 @@ QDIR = "moqueue"
 # Configure option parser
 opt_parser = OptionParser()
 
-opt_parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-    default=False, help="Print informative messages to the command line."
+opt_parser.add_option(
+    "-v", "--verbose", action="store_true", dest="verbose", default=False,
+    help="Print informative messages to the command line."
 )
 
 (options, args) = opt_parser.parse_args()
@@ -57,10 +58,9 @@ if len(args) < 1:
 else:
     Q.add(args[0])
 
-
 # Monitor the queue dir if there are files send them oldest to newest.
 def check_queue_dir(dir):
-    while True:        
+    while True:
         while Q.count() > 0:
             old = os.stat(dir).st_mtime
             log.info("Getting oldest file from queue...")
@@ -70,7 +70,10 @@ def check_queue_dir(dir):
             with open(oldest_file) as f:
                 data = f.read()
 
-            t = threading.Thread(target=App.send_sbd_message, args=(data, oldest_file))
+            t = threading.Thread(
+                target=App.send_sbd_message, args=(data, oldest_file)
+            )
+
             t.start()
             print 'waiting...'
             Q.update(dir, old)
@@ -89,8 +92,10 @@ try:
 
     t.daemon = True
     t.start()
+
     while not App.ready:
         pass
+
     check_queue_dir(QDIR)
     signal.pause()
 except KeyboardInterrupt:

@@ -8,14 +8,10 @@ import sys
 import time
 import serial
 import threading
-import ConfigParser as cfgp
-
-# Set up config
-config = cfgp.ConfigParser()
-config.read("./config.ini")
 
 # Application imports
-from parse import Parse
+from config import Config
+from parse  import Parse
 from logger import log
 
 # The Modem class represents the Iridium 9602 modem within the RockBLOCK,
@@ -27,10 +23,10 @@ class Modem(object):
     # Initialize with simple defaults
     def __init__(self, baud=None, port=None, delay=None):
         if baud is None:
-            baud = config.get("modem", "baud")
+            baud = Config.get("modem")["baud"]
 
         if port is None:
-            port = config.get("modem", "port")
+            port = Config.get("modem")["port"]
 
         self.baud = baud
         self.port = port
@@ -39,11 +35,11 @@ class Modem(object):
 
         self.data  = ""
         self.delay = delay
-        
+
         #send two commands simultaniously
         self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
         self.ready = False
-        
+
     # String return of port status (for debugging)
     def status(self):
         baud   = "baud: %r \n" % self.baud
@@ -56,49 +52,54 @@ class Modem(object):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
         log.debug("sent command %s" % command)
-    
+
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
         self.filename = filename
         if len(message) > 270:
             return False
         else:
-            log.info("sending message.\nchars: %s\nmessage: %s" % (len(message), message))
+            log.info(
+                "sending message.\nchars: %s\nmessage: %s" %
+                (len(message), message)
+            )
             self.send_command("AT+SBDWT=%s" % message)
             #time.sleep(1)
             #self.send_command("AT+SBDS")
             return
-            
+
 
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
     def process_response(self, mode, callback):
-        if self.response in {"AT+SBDIX", "AT+SBDRT", "AT+SBDS"}:
+        if self.response in { "AT+SBDIX", "AT+SBDRT", "AT+SBDS" }:
             self.send_command(self.response)
-            
+
         elif self.response == "CLEAR":
-            log.info("Clearing output buffer")
+            log.info("Clearing output buffer...")
             self.send_command("AT+SBDD0")
             if self.filename:
                 log.info("Deleting file: %s" % self.filename)
                 os.remove(self.filename)
-                
-        elif self.response in {"AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1", "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS", "AT\nOK"}:
+
+        elif self.response in {
+            "AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1", "AT+SBDAREG=1;+SBDMTA=1",
+            "AT+SBDD", "AT+SBDS", "AT\nOK" }:
             log.info(self.response)
             self.ready = True
-            
+
         elif self.response:
             if callable(callback):
                     c = threading.Thread(target=callback, args=(self.response,))
                     c.start()
-                    
+
         elif self.response == False:
             log.info(self.response)
-            
+
         else:
             print "ELSE"
             log.info(self.response)
-       
+
     # The monitor function sets up a listener on the serial port to await
     # commands.
     def monitor(self, stop_event,  mode, callback):
@@ -115,4 +116,3 @@ class Modem(object):
                     lines = ""
                     self.response = Parser.request(self.data, self.delay, mode)
                     self.process_response(self.response, callback)
-                    

@@ -4,21 +4,19 @@
 
 # Python imports
 import logging
-import ConfigParser as cfgp
 
-# Set up config
-config = cfgp.ConfigParser()
-config.read("./config.ini")
+# Application imports
+from config import Config
 
 # Configure logging
-log = logging.getLogger(config.get("log", "log_name"))
+log = logging.getLogger(Config.get("log")["log_name"])
 log.setLevel(logging.DEBUG)
 
 # Define handlers
 sh = logging.StreamHandler()
 sh.setLevel(logging.DEBUG)
 
-fh = logging.FileHandler(config.get("log", "log_filename"))
+fh = logging.FileHandler(Config.get("log")["log_filename"])
 fh.setLevel(logging.INFO)
 
 # Apply formatting to log output

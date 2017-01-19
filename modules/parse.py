@@ -10,7 +10,7 @@ import time
 import threading
 
 # Application imports
-from logger import log
+from   logger import log
 import modem
 
 class Parse(object):
@@ -62,7 +62,7 @@ class Parse(object):
     def try_again(self):
         time.sleep(45)
         return
-    
+
     # Request handler: SBDIX
     def _sbdix(self, data, mode):
         d = re.search(".+SBDIX\: (.+)", data)
@@ -82,28 +82,34 @@ class Parse(object):
                     log.debug("%s - %s" % (key, status[key]))
 
                 if mode[0] == "listen":
-                    log.debug("*****listen mode")
+                    log.debug("***** Listen mode.")
                     if status["mtstatus"] == 1:
                         return "AT+SBDRT"
                     elif status["mtstatus"] == 2:
-                        log.debug("message failure, trying again in 45 seconds...")
+                        log.debug(
+                            "Message failure, retrying in 45 seconds..."
+                        )
                         self.try_again()
                         return "AT+SBDIX"
                     else:
-                        log.warn("no message avaialble.  could be a problem!")
+                        log.warn(
+                            "No message available. Could be a problem!"
+                        )
                         return "AT+SBDS"
                 elif mode[0] == "send":
-                    log.debug("*****send mode")
+                    log.debug("***** Send mode.")
                     if status["mostatus"] < 4:
-                        log.debug("MO message sent")
+                        log.debug("MO message sent.")
                         return "CLEAR"
                     else:
-                        log.info("Message failed to send trying again in 45 seconds...")
+                        log.info(
+                            "Message failed to send retrying in 45 seconds..."
+                        )
                         self.try_again()
                         return "AT+SBDIX"
                 else:
                     log.debug("wtf mode")
-                        
+
             else:
                 log.warn("Failed to split incoming message.")
                 #return False
@@ -117,7 +123,7 @@ class Parse(object):
         log.debug("Raw message: %s" % data)
         log.debug("Parsed message: %s" % message_parsed)
         return message_parsed
-        
+
 
     # Request handler: SBDS
     @staticmethod
@@ -136,7 +142,6 @@ class Parse(object):
 
 
         if status["mostatus"] > 0:
-            return "AT+SBDIX" 
+            return "AT+SBDIX"
         return "AT+SBDS"
     # Request handler: SBDWT
-

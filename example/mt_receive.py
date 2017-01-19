@@ -33,7 +33,8 @@ print(App.status())
 # Allow ^C to exit gracefully.
 try:
     initiate_stop = threading.Event()
-    monitor_mode = ["listen"]
+    monitor_mode  = ["listen"]
+
     t = threading.Thread(
         target=App.monitor, args=(initiate_stop, monitor_mode, _callback)
     )

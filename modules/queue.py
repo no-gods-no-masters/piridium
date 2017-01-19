@@ -53,8 +53,9 @@ class Queue(object):
         oldest_file = dict[time_list[0]]
         return oldest_file
 
-    # if there are no changes to the directory (monitor_dir) being monitored 'wait'
-    def update(self,monitor_dir, old_time):
+    # If there are no changes to the directory (monitor_dir) being monitored
+    # 'wait'.
+    def update(self, monitor_dir, old_time):
         while os.stat(monitor_dir).st_mtime == old_time:
             time.sleep(1)
             pass
