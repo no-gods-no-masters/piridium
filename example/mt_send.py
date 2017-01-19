@@ -23,7 +23,7 @@ from config import Config
 opt_parser = OptionParser()
 opt_parser.add_option(
     "-x", "--rockblock-select", dest="which_rb",
-    help="Specify which RockBLOCK, options include: 'sma', and 'patch'."
+    help="Specify which RockBLOCK based on './config.ini'."
 )
 
 opt_parser.add_option(

@@ -59,7 +59,7 @@ class Parse(object):
         return "AT+SBDD"
 
     # Wait 45 seconds and try again
-    def try_again(self):
+    def _try_again(self):
         time.sleep(45)
         return
 
@@ -89,7 +89,7 @@ class Parse(object):
                         log.debug(
                             "Message failure, retrying in 45 seconds..."
                         )
-                        self.try_again()
+                        self._try_again()
                         return "AT+SBDIX"
                     else:
                         log.warn(
@@ -105,7 +105,7 @@ class Parse(object):
                         log.info(
                             "Message failed to send retrying in 45 seconds..."
                         )
-                        self.try_again()
+                        self._try_again()
                         return "AT+SBDIX"
                 else:
                     log.debug("wtf mode")
