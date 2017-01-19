@@ -80,8 +80,9 @@ if options.verbose:
 # Collect the username and password from the user if not in config.
 # Empty string is used for testing.
 username = Config.get("post")["username"]
+
 if not options.test_mode:
-    pw = config.get("post")["password"]
+    pw = Config.get("post")["password"]
     if not pw:
         pw = getpass.getpass("Rock7 password: ")
 else:
