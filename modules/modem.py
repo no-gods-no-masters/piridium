@@ -51,7 +51,7 @@ class Modem(object):
     def send_command(self, message):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
-        log.debug("sent command %s" % command)
+        log.debug("Sent command: %s" % command)
 
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
@@ -60,7 +60,7 @@ class Modem(object):
             return False
         else:
             log.info(
-                "sending message.\nchars: %s\nmessage: %s" %
+                "Sending message.\nChars: %s\nMessage: %s" %
                 (len(message), message)
             )
             self.send_command("AT+SBDWT=%s" % message)

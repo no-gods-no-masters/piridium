@@ -59,7 +59,7 @@ try:
 except:
     sys.stderr.write(
         "Use the -x flag to specify -x sma or -x patch to select RockBLOCK.\n\
-For more information please see send-example.ini.\n"
+        For more information please see send-example.ini.\n"
     )
     sys.exit(1)
 
@@ -73,7 +73,7 @@ else:
 
 # Print debug information.
 if options.verbose:
-    sys.stdout.write("Output    : %s\n" % args[0])
+    sys.stdout.write("Output: %s\n" % args[0])
     sys.stdout.write('Hex output: %s\n' % send_string)
     sys.stdout.write('RockBLOCK name: %s\n' % options.which_rb)
 

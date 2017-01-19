@@ -109,7 +109,6 @@ class Parse(object):
                         return "AT+SBDIX"
                 else:
                     log.debug("wtf mode")
-
             else:
                 log.warn("Failed to split incoming message.")
                 #return False
@@ -123,7 +122,6 @@ class Parse(object):
         log.debug("Raw message: %s" % data)
         log.debug("Parsed message: %s" % message_parsed)
         return message_parsed
-
 
     # Request handler: SBDS
     @staticmethod
@@ -139,7 +137,6 @@ class Parse(object):
 
             for key in status.keys():
                 log.debug("%s - %s" % (key, status[key]))
-
 
         if status["mostatus"] > 0:
             return "AT+SBDIX"
