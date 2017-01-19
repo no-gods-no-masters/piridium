@@ -22,6 +22,11 @@ We have included a stripped down version of that application as an example for o
 #### imei
 `<identifier>` (str) [ `000000000000000` ] A RockBLOCK \<identifier> followed by the IMEI value for that RockBLOCK.
 
+#### log
+`log_name` (str) [ `app` ] Name of internal log.
+
+`log_filename` (str) [ `app.log` ] Name of file log is saved to.
+
 #### post
 `url` (str) [ `https://core.rock7.com/rockblock/MT` ] Rock7 communication endpoint. This shouldn't change.
 
@@ -74,4 +79,3 @@ Allows MO (Mobile Originated) SBD (Short Burst Data) messages to be sent from a 
 `./mo_send.py -v "ocean temp 17C"`
 
 Sends the message `"ocean temp 17C"` as a MO (mobile originated) SBD message from the RockBLOCK to the RockBLOCK portal.
-
