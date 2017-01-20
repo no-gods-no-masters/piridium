@@ -38,8 +38,8 @@ Security is handled via simple auth over an HTTPS connection.
 
 ### Dependencies
 - Python 2.7.x
-  - Modules
-    - ConfigParser, getpass, optparse, os, time, re, serial, signal, sys, threading, urllib, urllib2, uuid
+  - Required modules:
+    - ConfigParser, getpass, optparse, os, re, serial, signal, sys, threading, time, urllib, urllib2, uuid
 - Git (optional)
 - Raspbian (untested with other \*nix flavors)
 
