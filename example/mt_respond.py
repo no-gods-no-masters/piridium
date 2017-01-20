@@ -30,11 +30,11 @@ Q      = Queue(QDIR)
 def _callback(data):
     print("Callback: %s" % data)
 
-    reply_to_send   = Config.get("respond")["reply"]
-    string_to_match = Config.get("respond")["match"]
+    messages_response = Config.get("respond")["response"]
+    string_to_match   = Config.get("respond")["match"]
 
     if string_to_match in data:
-        Q.add(reply_to_send)
+        Q.add(messages_response)
 
         old = os.stat(QDIR).st_mtime
         log.debug("Old time: %s" % repr(old))

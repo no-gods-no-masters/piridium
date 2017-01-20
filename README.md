@@ -57,14 +57,14 @@ Installing the application is straightforward whether you're downloading a ZIP o
 
 #### config.ini
 
-##### Log
+##### log
 `log_filename` (str) [`app.log`]
 Filename for the logger to output to.
 
 `log_name` (str) [`app`]
 Internal name for the logger to reference within the application.
 
-##### Modem
+##### modem
 `baud` (int) [`19200`]
 Baud rate to communicate with the port.
 
@@ -72,7 +72,7 @@ Baud rate to communicate with the port.
 Port to communicate with.
 
 ##### Retreiving Config Data
-A wrapper has been built for ConfigParser to simplify and normalize the retreival of config data. 
+A wrapper has been built for ConfigParser to simplify and normalize the retreival of config data.
 The correct syntax is `Config.get("section")["key"]`, where \<section> is required and [key] is optional. If you do not specify a [key] the function will return a dictionary object for the specified \<section>.
 
 ## Hardware

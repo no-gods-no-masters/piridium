@@ -7,7 +7,7 @@ We have included a stripped down version of that application as an example for o
 
 ## Dependencies
 - [Piridium](https://github.com/no-gods-no-masters/piridium/)
-- `./mt_receive.py`, `./mo_send.py`
+- `./mt_receive.py`, `./mt_respond.py`, `./mo_send.py`
   - Raspbian (untested with other \*nix flavors)
 - `./mt_send.py`
   - Raspbian, macOS, Ubuntu (untested with other \*nix flavors)
@@ -20,12 +20,17 @@ We have included a stripped down version of that application as an example for o
 
 ### config.ini
 #### imei
-`<identifier>` (str) [ `000000000000000` ] A RockBLOCK \<identifier> followed by the IMEI value for that RockBLOCK.
+`identifier` (str) [ `000000000000000` ] A RockBLOCK identifier followed by the IMEI value for that RockBLOCK.
 
 #### log
 `log_name` (str) [ `app` ] Name of internal log.
 
 `log_filename` (str) [ `app.log` ] Name of file log is saved to.
+
+#### modem
+`baud` (int) [`19200`] Baud rate to communicate with the port.
+
+`port` (str) [`/dev/ttyUSB0`] Port to communicate with.
 
 #### post
 `url` (str) [ `https://core.rock7.com/rockblock/MT` ] Rock7 communication endpoint. This shouldn't change.
@@ -34,10 +39,20 @@ We have included a stripped down version of that application as an example for o
 
 `password` (str) [ `password` ] Your Rock7 password.
 
+#### respond
+`match` (str) [ `"String to match"` ] String `mt_respond.py` looks for in incoming SBD messages.
+
+`response` (str) [ `"Response to send"` ] String `mt_respond.py` responds with when messages contain `match` string.
+
 ## Receive & Process MT Data
 `./mt_receive.py`
 
 Run on the RockBLOCK and sets up a listener to await incoming and Mobile Terminated (MT) data and implements a callback function for processing the included messages. It needs to be running for messages from `mt_send.py` to be picked up.
+
+## Respond to MT Data
+`./mt_respond.py`
+
+Run on the RockBLOCK, this script monitors the serial port and waits for incoming SBD messages. When one is received, it checks for a string as defined in `config.ini` . If the string matches, a reply (also defined in config.ini) is sent, else it just logs the incoming message.
 
 ## Send MT Data
 `./mt_send.py`
