@@ -23,9 +23,11 @@ Security is handled via simple auth over an HTTPS connection.
     example/
       config-example.ini : Example application - configuration variables
       mt_receive.py      : Example application - receive MT data
+      mt_respond.py      : Example application - respond to MT data
       mt_send.py         : Example application - send MT data
       mo_send.py         : Example application - send MO data
     modules/
+      config.py : Simple ConfigParser wrapper
       logger.py : Logging setup
       modem.py  : Modem communication functions
       parse.py  : Handles incoming and outgoing requests
