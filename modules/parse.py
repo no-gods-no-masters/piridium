@@ -19,7 +19,6 @@ class Parse(object):
 
     # Parse an incoming request
     def request(self, data, delay, mode):
-        #print "PARSING\n---v\n%s\n^---" % data
         if "SBDRING" in data:
             log.info("SBDRING detected. Sending AT+SBDIX.")
             return "AT+SBDIX"
@@ -111,7 +110,6 @@ class Parse(object):
                     log.debug("wtf mode")
             else:
                 log.warn("Failed to split incoming message.")
-                #return False
 
     # Request handler: SBDRT
     @staticmethod
@@ -141,4 +139,3 @@ class Parse(object):
         if status["mostatus"] > 0:
             return "AT+SBDIX"
         return
-    # Request handler: SBDWT
