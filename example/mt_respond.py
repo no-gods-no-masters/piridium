@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# Core functions
+# Check for a string as defined in config.ini in an SBD message. If the string
+# matches, a reply (also defined in config.ini) is sent, else it just logs the
+# incoming message.
 
 # Python imports
 import os
@@ -9,9 +11,8 @@ import signal
 import threading
 
 # Application imports
-
-# Library imports
 sys.path.append("../modules")
+from config import Config
 from modem  import Modem
 from logger import log
 from queue  import Queue
@@ -25,48 +26,55 @@ App    = Modem()
 Parser = Parse()
 Q      = Queue(QDIR)
 
-# Check for the string "hi greg" in the SMD message
-# if "hi greg" is found a reply is sent
-# else it just logs the incoming message
-# this could be usefull if you want signal the system to
-# data only when instructed.
-
+# Callback is fired when an SBD message comes in.
 def _callback(data):
     print("Callback: %s" % data)
-    if "hi greg" in data:
 
-        Q.add("hi mike")
+    reply_to_send   = Config.get("respond")["reply"]
+    string_to_match = Config.get("respond")["match"]
+
+    if string_to_match in data:
+        Q.add(reply_to_send)
 
         old = os.stat(QDIR).st_mtime
         log.debug("Old time: %s" % repr(old))
 
         while Q.count() > 0:
             log.info("SBDIX mode set to 'send'.")
+
             monitor_mode[0] = "send"
-            oldest_file = Q.get()
+            oldest_file     = Q.get()
 
             with open(oldest_file) as f:
                 data = f.read()
 
-            t = threading.Thread(target=App.send_sbd_message, args=(data, oldest_file))
+            t = threading.Thread(
+                target=App.send_sbd_message, args=(data, oldest_file)
+            )
+
             t.start()
             Q.update(QDIR, old)
         log.debug("Queue empty.")
         log.info("Monitor mode set to 'listen'.")
         monitor_mode[0] = ["listen"]
     else:
-        log.debug("message doesn't contain hi greg\nmessage: %s" % data)
+        log.debug("Message doesn't match config.ini string: %s" % data)
 
-# Check to make sure the modem is connected
+# Check to make sure the modem is connected.
 print(App.status())
 
-# Monitor serial port
+# Monitor serial port.
 try:
     initiate_stop = threading.Event()
-    monitor_mode = ["listen"]
-    t = threading.Thread(target=App.monitor, args=(initiate_stop, monitor_mode, _callback))
+    monitor_mode  = ["listen"]
+
+    t = threading.Thread(
+        target=App.monitor, args=(initiate_stop, monitor_mode, _callback)
+    )
+
     t.daemon = True
     t.start()
+
     print "Thread count: ", threading.active_count()
     signal.pause()
 except KeyboardInterrupt:
