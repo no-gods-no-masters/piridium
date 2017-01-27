@@ -23,7 +23,7 @@ from config import Config
 opt_parser = OptionParser()
 opt_parser.add_option(
     "-x", "--rockblock-select", dest="which_rb",
-    help="Specify which RockBLOCK based on './config.ini'."
+    help="Specify a RockBLOCK based on './config.ini'."
 )
 
 opt_parser.add_option(
@@ -58,8 +58,7 @@ try:
     imei = Config.get("imei")[options.which_rb]
 except:
     sys.stderr.write(
-        "Use the -x flag to specify -x sma or -x patch to select RockBLOCK.\n\
-        For more information please see send-example.ini.\n"
+        "Use the -x flag to specify a RockBLOCK based on './config.ini'.\n"
     )
     sys.exit(1)
 

@@ -66,7 +66,6 @@ class Modem(object):
             self.send_command("AT+SBDWT=%s" % message)
             return
 
-
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
     def process_response(self, mode, callback):
