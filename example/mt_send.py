@@ -85,9 +85,9 @@ if not options.test_mode:
     if not pw:
         pw = getpass.getpass("Rock7 password: ")
 else:
-    pw = ''
+    pw = ""
 
-# TO DO: Move these to an external configuration file.
+# Set up user defined variables from config.ini
 url  = Config.get("post")["url"]
 data = urllib.urlencode({
     "imei"     : imei,
