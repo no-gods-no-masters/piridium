@@ -102,7 +102,3 @@ Creating your own application that utilizes Piridium is straightforward.
 - Create a new repo for your application.
 - Either initialize Piridium as a submodule (preferred) in a library folder, or copy the code into your library folder.
   - Import the modules in your Python script per your directory structure, and refer to our `./example` application documentation.
-
-## Credits
-- Conceptualized and funded by [Hala Systems](http://halasystems.com).
-- Developed, implemented, and documented by [NGNM](http://ngnm.us/).

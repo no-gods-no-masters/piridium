@@ -75,7 +75,7 @@ def check_queue_dir(dir):
             )
 
             t.start()
-            print 'waiting...'
+            print 'Waiting...'
             Q.update(dir, old)
         else:
             old = os.stat(dir).st_mtime

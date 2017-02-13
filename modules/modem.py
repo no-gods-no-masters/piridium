@@ -99,7 +99,7 @@ class Modem(object):
 
     # The monitor function sets up a listener on the serial port to await
     # commands.
-    def monitor(self, stop_event,  mode, callback):
+    def monitor(self, stop_event, mode, callback):
         log.debug("Monitoring serial port '" + self.port + "'")
         log.debug("Monitor mode: %s" % mode)
         lines = ""

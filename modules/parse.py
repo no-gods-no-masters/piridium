@@ -69,7 +69,7 @@ class Parse(object):
             log.debug("SBDIX values - %s" % d.group(1))
 
             if len(d.group(1).split(",")) > 1:
-                status={}
+                status = {}
                 status["mostatus"] = int(d.group(1).split(",")[0])
                 status["momsn"]    = int(d.group(1).split(",")[1])
                 status["mtstatus"] = int(d.group(1).split(",")[2])
