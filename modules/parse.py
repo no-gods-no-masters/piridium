@@ -11,14 +11,26 @@ import threading
 
 # Application imports
 from   logger import log
+from   config import Config
 import modem
 
 class Parse(object):
+    def __init__(self):
+        self.mtqueue = 0
+        self.holding_mt = 0
+
+        self.retry = int(Config.get("modem")["retry"])
 
     # Public methods
+    def read_mtqueue_count(self):
+        return self.mtqueue
+
+    def read_holding_mt(self):
+        return self.holding_mt
 
     # Parse an incoming request
     def request(self, data, delay, mode):
+        #print "PARSING\n---v\n%s\n^---" % data
         if "SBDRING" in data:
             log.info("SBDRING detected. Sending AT+SBDIX.")
             return "AT+SBDIX"
@@ -57,9 +69,9 @@ class Parse(object):
     def _sbdd(data):
         return "AT+SBDD"
 
-    # Wait 45 seconds and try again
+    # Wait 20 seconds and try again
     def _try_again(self):
-        time.sleep(45)
+        time.sleep(self.retry)
         return
 
     # Request handler: SBDIX
@@ -69,7 +81,7 @@ class Parse(object):
             log.debug("SBDIX values - %s" % d.group(1))
 
             if len(d.group(1).split(",")) > 1:
-                status = {}
+                status={}
                 status["mostatus"] = int(d.group(1).split(",")[0])
                 status["momsn"]    = int(d.group(1).split(",")[1])
                 status["mtstatus"] = int(d.group(1).split(",")[2])
@@ -77,16 +89,18 @@ class Parse(object):
                 status["mtlength"] = int(d.group(1).split(",")[4])
                 status["mtqueued"] = int(d.group(1).split(",")[5])
 
-                for key in status.keys():
-                    log.debug("%s - %s" % (key, status[key]))
+                # for key in status.keys():
+                #     log.debug("%s - %s" % (key, status[key]))
 
                 if mode[0] == "listen":
                     log.debug("***** Listen mode.")
                     if status["mtstatus"] == 1:
+                        self.mtqueue = status["mtqueued"]
                         return "AT+SBDRT"
                     elif status["mtstatus"] == 2:
-                        log.debug(
-                            "Message failure, retrying in 45 seconds..."
+                        log.info(
+                            "Message failure, retrying in %s seconds...\n\
+sbdix: %s" % (self.retry, status)
                         )
                         self._try_again()
                         return "AT+SBDIX"
@@ -99,10 +113,15 @@ class Parse(object):
                     log.debug("***** Send mode.")
                     if status["mostatus"] < 4:
                         log.debug("MO message sent.")
+                        self.mtqueue = status["mtqueued"]
+                        if status["mtstatus"] == 1:
+                            self.holding_mt = True
+                        else:
+                            self.holding_mt = False
                         return "CLEAR"
                     else:
                         log.info(
-                            "Message failed to send retrying in 45 seconds..."
+                            "Message failed to send retrying in %s seconds..." % self.retry
                         )
                         self._try_again()
                         return "AT+SBDIX"
@@ -110,6 +129,7 @@ class Parse(object):
                     log.debug("wtf mode")
             else:
                 log.warn("Failed to split incoming message.")
+                #return False
 
     # Request handler: SBDRT
     @staticmethod
@@ -139,3 +159,4 @@ class Parse(object):
         if status["mostatus"] > 0:
             return "AT+SBDIX"
         return
+    # Request handler: SBDWT

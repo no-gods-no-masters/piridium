@@ -17,7 +17,7 @@ from logger import log
 # The Modem class represents the Iridium 9602 modem within the RockBLOCK,
 # and contains all functions related to the modem. It should be instantiated
 # once for each RockBLOCK.
-Parser = Parse()
+
 class Modem(object):
 
     # Initialize with simple defaults
@@ -36,10 +36,15 @@ class Modem(object):
         self.data  = ""
         self.delay = delay
 
+        self.sbdring_time = 0
+        self.sbdix_time   = 0
+        self.retry_count  = 0
+
         #send two commands simultaniously
         self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
         self.ready = False
 
+        self.Parser = Parse()
     # String return of port status (for debugging)
     def status(self):
         baud   = "baud: %r \n" % self.baud
@@ -65,6 +70,7 @@ class Modem(object):
             )
             self.send_command("AT+SBDWT=%s" % message)
             return
+
 
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
@@ -99,7 +105,15 @@ class Modem(object):
 
     # The monitor function sets up a listener on the serial port to await
     # commands.
-    def monitor(self, stop_event, mode, callback):
+
+    def retry_reset(self):
+        self.retry_count = 0
+        self.sbdring_time = time.time()
+
+    def retry_incriment(self):
+        self.retry_count += 1
+
+    def monitor(self, stop_event,  mode, status, callback):
         log.debug("Monitoring serial port '" + self.port + "'")
         log.debug("Monitor mode: %s" % mode)
         lines = ""
@@ -110,6 +124,13 @@ class Modem(object):
             for word in targetWordList:
                 if word in line:
                     self.data = lines
+                    # print "status: %s" % status[0]
                     lines = ""
-                    self.response = Parser.request(self.data, self.delay, mode)
+                    if "SBDRING" in self.data:
+                        self.retry_reset()
+                        status[0] = 'busy'
+                    self.response = self.Parser.request(self.data, self.delay, mode)
+                    if "SBDIX" in self.response:
+                        self.retry_incriment()
                     self.process_response(self.response, callback)
+                    # print "status: %s" % status[0]
