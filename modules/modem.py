@@ -110,7 +110,7 @@ class Modem(object):
         self.retry_count = 0
         self.sbdring_time = time.time()
 
-    def retry_incriment(self):
+    def retry_increment(self):
         self.retry_count += 1
 
     def monitor(self, stop_event,  mode, status, callback):
@@ -138,6 +138,6 @@ class Modem(object):
                     )
 
                     if "SBDIX" in self.response:
-                        self.retry_incriment()
+                        self.retry_increment()
 
                     self.process_response(self.response, callback)
