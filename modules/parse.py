@@ -10,9 +10,10 @@ import time
 import threading
 
 # Application imports
-from   logger import log
-from   config import Config
+from logger import log
+from config import Config
 import modem
+
 
 class Parse(object):
     def __init__(self):
@@ -30,7 +31,6 @@ class Parse(object):
 
     # Parse an incoming request
     def request(self, data, delay, mode):
-        #print "PARSING\n---v\n%s\n^---" % data
         if "SBDRING" in data:
             log.info("SBDRING detected. Sending AT+SBDIX.")
             return "AT+SBDIX"
@@ -81,11 +81,11 @@ class Parse(object):
             log.debug("SBDIX values - %s" % d.group(1))
 
             if len(d.group(1).split(",")) > 1:
-                status={}
+                status = {}
                 status["mostatus"] = int(d.group(1).split(",")[0])
-                status["momsn"]    = int(d.group(1).split(",")[1])
+                status["momsn"] = int(d.group(1).split(",")[1])
                 status["mtstatus"] = int(d.group(1).split(",")[2])
-                status["mtmsn"]    = int(d.group(1).split(",")[3])
+                status["mtmsn"] = int(d.group(1).split(",")[3])
                 status["mtlength"] = int(d.group(1).split(",")[4])
                 status["mtqueued"] = int(d.group(1).split(",")[5])
 
@@ -121,7 +121,8 @@ sbdix: %s" % (self.retry, status)
                         return "CLEAR"
                     else:
                         log.info(
-                            "Message failed to send retrying in %s seconds..." % self.retry
+                            "Message failed to send retrying in %s seconds..."
+                            % self.retry
                         )
                         self._try_again()
                         return "AT+SBDIX"
@@ -129,7 +130,6 @@ sbdix: %s" % (self.retry, status)
                     log.debug("wtf mode")
             else:
                 log.warn("Failed to split incoming message.")
-                #return False
 
     # Request handler: SBDRT
     @staticmethod
@@ -147,11 +147,11 @@ sbdix: %s" % (self.retry, status)
         d = re.search(".+SBDS\: (.+)", data)
         if d:
             log.debug("SBDS values - %s" % d.group(1))
-            status={}
+            status = {}
             status["mostatus"] = int(d.group(1).split(",")[0])
-            status["momsn"]    = int(d.group(1).split(",")[1])
+            status["momsn"] = int(d.group(1).split(",")[1])
             status["mtstatus"] = int(d.group(1).split(",")[2])
-            status["mtmsn"]    = int(d.group(1).split(",")[3])
+            status["mtmsn"] = int(d.group(1).split(",")[3])
 
             for key in status.keys():
                 log.debug("%s - %s" % (key, status[key]))

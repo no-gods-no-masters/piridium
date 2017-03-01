@@ -11,13 +11,13 @@ import threading
 
 # Application imports
 from config import Config
-from parse  import Parse
+from parse import Parse
 from logger import log
+
 
 # The Modem class represents the Iridium 9602 modem within the RockBLOCK,
 # and contains all functions related to the modem. It should be instantiated
 # once for each RockBLOCK.
-
 class Modem(object):
 
     # Initialize with simple defaults
@@ -33,23 +33,24 @@ class Modem(object):
 
         self.serialPort = serial.Serial(baudrate=baud, port=port)
 
-        self.data  = ""
+        self.data = ""
         self.delay = delay
 
         self.sbdring_time = 0
-        self.sbdix_time   = 0
-        self.retry_count  = 0
+        self.sbdix_time = 0
+        self.retry_coun = 0
 
-        #send two commands simultaniously
+        # Send two commands simultaneously
         self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
         self.ready = False
 
         self.Parser = Parse()
+
     # String return of port status (for debugging)
     def status(self):
-        baud   = "baud: %r \n" % self.baud
+        baud = "baud: %r \n" % self.baud
         isOpen = "isOpen: %r \n" % self.serialPort.isOpen()
-        port   = "port: %r \n" % self.port
+        port = "port: %r \n" % self.port
         return (baud + isOpen + port)
 
     # Send a command directly to the modem
@@ -71,11 +72,10 @@ class Modem(object):
             self.send_command("AT+SBDWT=%s" % message)
             return
 
-
     # When we process the buffer the program either sends a command to the
     # modem or parses the buffer as a response from Iridium.
     def process_response(self, mode, callback):
-        if self.response in { "AT+SBDIX", "AT+SBDRT", "AT+SBDS" }:
+        if self.response in {"AT+SBDIX", "AT+SBDRT", "AT+SBDS"}:
             self.send_command(self.response)
 
         elif self.response == "CLEAR":
@@ -85,18 +85,18 @@ class Modem(object):
                 log.info("Deleting file: %s" % self.filename)
                 os.remove(self.filename)
 
-        elif self.response in {
-            "AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1", "AT+SBDAREG=1;+SBDMTA=1",
-            "AT+SBDD", "AT+SBDS", "AT\nOK" }:
+        elif self.response in {"AT+CSQF", "AT+SBDMTA=1", "AT+SBDAREG=1",
+                               "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS",
+                               "AT\nOK"}:
             log.info(self.response)
             self.ready = True
 
         elif self.response:
             if callable(callback):
-                    c = threading.Thread(target=callback, args=(self.response,))
-                    c.start()
+                c = threading.Thread(target=callback, args=(self.response,))
+                c.start()
 
-        elif self.response == False:
+        elif self.response is False:
             log.info(self.response)
 
         else:
@@ -116,21 +116,28 @@ class Modem(object):
     def monitor(self, stop_event,  mode, status, callback):
         log.debug("Monitoring serial port '" + self.port + "'")
         log.debug("Monitor mode: %s" % mode)
+
         lines = ""
         targetWordList = ["OK", "SBDRING"]
+
         while True:
-            line =  self.serialPort.readline()
+            line = self.serialPort.readline()
             lines += line
+
             for word in targetWordList:
                 if word in line:
                     self.data = lines
-                    # print "status: %s" % status[0]
                     lines = ""
+
                     if "SBDRING" in self.data:
                         self.retry_reset()
                         status[0] = 'busy'
-                    self.response = self.Parser.request(self.data, self.delay, mode)
+
+                    self.response = self.Parser.request(
+                        self.data, self.delay, mode
+                    )
+
                     if "SBDIX" in self.response:
                         self.retry_incriment()
+
                     self.process_response(self.response, callback)
-                    # print "status: %s" % status[0]
