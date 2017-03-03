@@ -9,9 +9,9 @@ import threading
 # Application imports
 from logger import log
 
+
 # The Queue class uses a simple file handler to read and write messages from
 # a disk-based queue for sending.
-
 class Queue(object):
     def __init__(self, qdir):
         self.qdir = qdir

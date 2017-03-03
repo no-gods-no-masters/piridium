@@ -10,6 +10,7 @@ import ConfigParser as cfgp
 config = cfgp.ConfigParser()
 config.read("./config.ini")
 
+
 class Config(object):
 
     @staticmethod
@@ -21,7 +22,9 @@ class Config(object):
                 dict1[option] = config.get(section, option)
                 if dict1[option] == -1:
                     log.debug("Skip: %s" % option)
-            except:
+            except ValueError as e:
                 print("Exception on %s!" % option)
+                log.debug(e)
+
                 dict1[option] = None
         return dict1
