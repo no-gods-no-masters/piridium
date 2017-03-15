@@ -38,7 +38,7 @@ class Modem(object):
 
         self.sbdring_time = 0
         self.sbdix_time = 0
-        self.retry_coun = 0
+        self.retry_count = 0
 
         # Send two commands simultaneously
         self.send_command("AT+SBDAREG=1;+SBDMTA=1;+SBDD2")
@@ -130,7 +130,7 @@ class Modem(object):
                     lines = ""
 
                     if "SBDRING" in self.data:
-                        self.retry_reset()
+                        #  self.retry_reset() this could be causeing problems
                         status[0] = 'busy'
 
                     self.response = self.Parser.request(
