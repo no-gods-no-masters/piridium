@@ -107,9 +107,10 @@ sbdix: %s" % (self.retry, status)
                         return "AT+SBDIX"
                     else:
                         log.warn(
-                            "No message available. Could be a problem!"
+                            "No message available on server"
                         )
-                        return "AT+SBDS"
+                        return "AT\nOK"
+
                 elif mode[0] == "send":
                     log.debug("***** Send mode.")
                     if status["mostatus"] < 4:
