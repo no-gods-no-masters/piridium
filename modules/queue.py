@@ -60,3 +60,8 @@ class Queue(object):
             time.sleep(1)
             pass
         return
+
+    def nuke(self):
+            for file in os.listdir(self.qdir):
+                os.remove(os.path.join(self.qdir, file))
+            return
