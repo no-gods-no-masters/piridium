@@ -54,6 +54,9 @@ class Parse(object):
             return out
         elif "AT+SBDAREG=1;+SBDMTA=1" in data:
             return "AT+SBDAREG=1;+SBDMTA=1"
+        elif "MSSTM" in data:
+            out = self._msstm(data)
+            return out
         else:
             return data
 
@@ -162,4 +165,11 @@ sbdix: %s" % (self.retry, status)
         if status["mostatus"] > 0:
             return "AT+SBDIX"
         return
-    # Request handler: SBDWT
+
+    @staticmethod
+    def _msstm(data):
+        d = re.search("(MSSTM\: .+)", data)
+        if d:
+            return d.group(1)
+
+    #Request handler: SBDWT

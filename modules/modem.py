@@ -58,6 +58,8 @@ class Modem(object):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
         log.debug("Sent command: %s" % command)
+        if command == "AT+SBDIX":
+            self.retry_increment()
 
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
@@ -90,6 +92,7 @@ class Modem(object):
                                "AT\nOK"}:
             log.info(self.response)
             self.ready = True
+
 
         elif self.response:
             if callable(callback):
@@ -137,7 +140,7 @@ class Modem(object):
                         self.data, self.delay, mode
                     )
 
-                    if "SBDIX" in self.response:
-                        self.retry_increment()
+                    # if "SBDIX" in self.response:
+                    #     self.retry_increment()
 
                     self.process_response(self.response, callback)
