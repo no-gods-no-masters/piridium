@@ -133,14 +133,10 @@ class Modem(object):
                     lines = ""
 
                     if "SBDRING" in self.data:
-                        #  self.retry_reset() this could be causeing problems
                         status[0] = 'busy'
 
                     self.response = self.Parser.request(
                         self.data, self.delay, mode
                     )
-
-                    # if "SBDIX" in self.response:
-                    #     self.retry_increment()
 
                     self.process_response(self.response, callback)

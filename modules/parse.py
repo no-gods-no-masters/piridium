@@ -31,7 +31,6 @@ class Parse(object):
 
     # Parse an incoming request
     def request(self, data, delay, mode):
-        # print "PARSING\n---v\n%s\n^---" % data
         if "SBDRING" in data:
             log.info("SBDRING detected. Sending AT+SBDIX.")
             return "AT+SBDIX"
@@ -92,9 +91,6 @@ class Parse(object):
                 status["mtmsn"] = int(d.group(1).split(",")[3])
                 status["mtlength"] = int(d.group(1).split(",")[4])
                 status["mtqueued"] = int(d.group(1).split(",")[5])
-
-                # for key in status.keys():
-                #     log.debug("%s - %s" % (key, status[key]))
 
                 if mode[0] == "listen":
                     log.debug("***** Listen mode.")
@@ -171,5 +167,3 @@ sbdix: %s" % (self.retry, status)
         d = re.search("(MSSTM\: .+)", data)
         if d:
             return d.group(1)
-
-    #Request handler: SBDWT

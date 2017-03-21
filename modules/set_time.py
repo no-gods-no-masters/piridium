@@ -6,7 +6,7 @@ import datetime
 from datetime import timedelta
 
 
-class SetTime(object):
+class Set_time(object):
     def __init__(self):
         self.era2 = datetime.datetime(2014, 05, 11, 14, 23, 55)
         self.ninety_miliseconds_ina_second = (1/0.09)
