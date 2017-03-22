@@ -91,8 +91,8 @@ class Modem(object):
                                "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS",
                                "AT\nOK"}:
             log.info(self.response)
+            self.send_command("AT-MSSTM")
             self.ready = True
-
 
         elif self.response:
             if callable(callback):
