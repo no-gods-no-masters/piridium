@@ -36,7 +36,7 @@ class Modem(object):
         self.data = ""
         self.delay = delay
 
-        self.sbdring_time = 0
+        self.sbdring_time = 'NA'
         self.sbdix_time = 0
         self.retry_count = 0
 
@@ -58,7 +58,7 @@ class Modem(object):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
         log.debug("Sent command: %s" % command)
-        if command == "AT+SBDIX":
+        if "AT+SBDIX" in command:
             self.retry_increment()
 
     # Send an SBD message
@@ -92,6 +92,8 @@ class Modem(object):
                                "AT\nOK"}:
             log.info(self.response)
             self.send_command("AT-MSSTM")
+            self.retry_reset()
+            self.sbdring_time = "NA"
             self.ready = True
 
         elif self.response:
@@ -111,7 +113,6 @@ class Modem(object):
 
     def retry_reset(self):
         self.retry_count = 0
-        self.sbdring_time = time.time()
 
     def retry_increment(self):
         self.retry_count += 1
@@ -134,6 +135,7 @@ class Modem(object):
 
                     if "SBDRING" in self.data:
                         status[0] = 'busy'
+                        self.sbdring_time = time.time()
 
                     self.response = self.Parser.request(
                         self.data, self.delay, mode
