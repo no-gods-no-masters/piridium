@@ -12,7 +12,6 @@ import threading
 # Application imports
 from logger import log
 from config import Config
-import modem
 
 
 class Parse(object):
