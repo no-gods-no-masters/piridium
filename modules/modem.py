@@ -61,6 +61,17 @@ class Modem(object):
         if "AT+SBDIX" in command:
             self.retry_increment()
 
+    def startup_test(self):
+        old = self.serialPort.inWaiting()
+        self.serialPort.write("AT\OK")
+        time.sleep(.1)
+        new = self.serialPort.write("AT\r")
+        new = self.serialPort.inWaiting()
+        if new > old:
+            return True
+        else:
+            return False
+
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
         self.filename = filename
