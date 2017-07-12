@@ -61,7 +61,8 @@ class Queue(object):
             pass
         return
 
-    def delete(self):
+    def nuke(self):
         for file in os.listdir(self.qdir):
             os.remove(os.path.join(self.qdir, file))
         return
+    

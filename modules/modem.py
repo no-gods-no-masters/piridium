@@ -36,7 +36,7 @@ class Modem(object):
         self.data = ""
         self.delay = delay
 
-        self.sbdring_time = 'NA'
+        self.sbdring_time = 0
         self.sbdix_time = 0
         self.retry_count = 0
 
@@ -58,20 +58,11 @@ class Modem(object):
         command = "%s\r" % message
         self.serialPort.write(bytes(command))
         log.debug("Sent command: %s" % command)
-        if "AT+SBDIX" in command:
+        if command == "AT+SBDIX":
             self.retry_increment()
-
-    def startup_test(self):
-        old = self.serialPort.inWaiting()
-        self.serialPort.write("AT\OK")
-        time.sleep(.1)
-        new = self.serialPort.write("AT\r")
-        new = self.serialPort.inWaiting()
-        if new > old:
-            return True
-        else:
-            return False
-
+            log.debug("************************************")
+            log.debug("************************************")
+            log.debug("************************************")
     # Send an SBD message
     def send_sbd_message(self, message, filename=''):
         self.filename = filename
@@ -102,10 +93,8 @@ class Modem(object):
                                "AT+SBDAREG=1;+SBDMTA=1", "AT+SBDD", "AT+SBDS",
                                "AT\nOK"}:
             log.info(self.response)
-            self.send_command("AT-MSSTM")
-            self.retry_reset()
-            self.sbdring_time = "NA"
             self.ready = True
+
 
         elif self.response:
             if callable(callback):
@@ -124,6 +113,7 @@ class Modem(object):
 
     def retry_reset(self):
         self.retry_count = 0
+        self.sbdring_time = time.time()
 
     def retry_increment(self):
         self.retry_count += 1
@@ -145,11 +135,14 @@ class Modem(object):
                     lines = ""
 
                     if "SBDRING" in self.data:
+                        #  self.retry_reset() this could be causeing problems
                         status[0] = 'busy'
-                        self.sbdring_time = time.time()
 
                     self.response = self.Parser.request(
                         self.data, self.delay, mode
                     )
+
+                    # if "SBDIX" in self.response:
+                    #     self.retry_increment()
 
                     self.process_response(self.response, callback)
